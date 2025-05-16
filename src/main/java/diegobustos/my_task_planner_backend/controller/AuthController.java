@@ -3,7 +3,6 @@ package diegobustos.my_task_planner_backend.controller;
 import diegobustos.my_task_planner_backend.dto.AuthRequest;
 import diegobustos.my_task_planner_backend.dto.AuthResponse;
 import diegobustos.my_task_planner_backend.service.JwtService;
-import diegobustos.my_task_planner_backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,16 +29,14 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
 
-    @PostMapping("/login")
     @Operation(
-            summary = "Authenticate a user and return a JWT token",
-            description = "This endpoint authenticates the user using email and password. "
-                    + "If the credentials are valid, a JWT token is returned to be used in subsequent requests."
+            summary = "Authenticate user and return JWT",
+            description = "Authenticates a user using their email and password. Returns a JWT token if credentials are valid."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Authentication successful. JWT token returned.",
+                    description = "Login successful. JWT token returned.",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = AuthResponse.class),
@@ -49,21 +45,30 @@ public class AuthController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request payload",
+                    description = "Invalid request payload (e.g., missing or blank fields).",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(value = "{\"message\": \"Email and password must not be empty\"}")
+                            examples = @ExampleObject(value = "{\"email\": \"Email is required\", \"password\": \"Password is required\"}")
                     )
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Authentication failed. Invalid credentials.",
+                    description = "Authentication failed: invalid credentials or user not found.",
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = "{\"message\": \"Invalid email or password\"}")
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected internal error.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"Something went wrong\"}")
+                    )
             )
     })
+    @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
