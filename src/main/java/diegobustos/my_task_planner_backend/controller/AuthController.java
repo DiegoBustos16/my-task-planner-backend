@@ -2,7 +2,9 @@ package diegobustos.my_task_planner_backend.controller;
 
 import diegobustos.my_task_planner_backend.dto.AuthRequest;
 import diegobustos.my_task_planner_backend.dto.AuthResponse;
+import diegobustos.my_task_planner_backend.dto.RegisterRequest;
 import diegobustos.my_task_planner_backend.service.JwtService;
+import diegobustos.my_task_planner_backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +31,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final UserService userService;
 
     @Operation(
             summary = "Authenticate user and return JWT",
@@ -79,4 +83,32 @@ public class AuthController {
 
         return new AuthResponse(token);
     }
+
+    @Operation(summary = "Register a new user", description = "Creates a new user account with first name, last name, email, and password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AuthResponse.class),
+                            examples = @ExampleObject(value = "{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6...\"}")
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid input or email already in use",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"Email already in use\"}")
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"An unexpected error occurred\"}")
+                    )
+            )
+    })
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(userService.registerUser(request));
+    }
+
 }
