@@ -3,7 +3,7 @@ package diegobustos.my_task_planner_backend.controller;
 import diegobustos.my_task_planner_backend.dto.AuthRequest;
 import diegobustos.my_task_planner_backend.dto.AuthResponse;
 import diegobustos.my_task_planner_backend.dto.RegisterRequest;
-import diegobustos.my_task_planner_backend.service.JwtService;
+import diegobustos.my_task_planner_backend.service.AuthService;
 import diegobustos.my_task_planner_backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,10 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final JwtService jwtService;
     private final UserService userService;
+    private final AuthService authService;
 
     @Operation(
             summary = "Authenticate user and return JWT",
@@ -73,15 +67,8 @@ public class AuthController {
             )
     })
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody AuthRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        String token = jwtService.generateToken(userDetails.getUsername());
-
-        return new AuthResponse(token);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @Operation(summary = "Register a new user", description = "Creates a new user account with first name, last name, email, and password.")
