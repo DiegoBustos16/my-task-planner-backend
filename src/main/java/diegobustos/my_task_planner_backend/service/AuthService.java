@@ -18,11 +18,13 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponse login(AuthRequest req) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
         );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
+
         String token = jwtService.generateToken(userDetails.getUsername());
 
         return new AuthResponse(token);
