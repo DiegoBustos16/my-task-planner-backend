@@ -5,6 +5,7 @@ import diegobustos.my_task_planner_backend.entity.User;
 import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import diegobustos.my_task_planner_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +39,8 @@ public class UserService {
         return new AuthResponse(token);
     }
 
-    public UserResponse updateUserById(String authorizationHeader, UpdateUserRequest request) {
-        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+    public UserResponse updateUserById(UpdateUserRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -50,16 +51,16 @@ public class UserService {
         return UserResponse.fromEntity(user);
     }
 
-    public UserResponse getUserById(String authorizationHeader) {
-        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+    public UserResponse getUserById() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return UserResponse.fromEntity(user);
     }
 
-    public void updatePasswordById(String authorizationHeader, UpdatePasswordRequest request) {
-        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+    public void updatePasswordById(UpdatePasswordRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -72,8 +73,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUserById (String authorizationHeader) {
-        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+    public void deleteUserById () {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 

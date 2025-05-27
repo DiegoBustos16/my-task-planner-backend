@@ -54,10 +54,9 @@ public class UserController {
     })
     @PatchMapping("/me")
     public ResponseEntity<UserResponse> updateCurrentUser(
-            @RequestBody @Valid UpdateUserRequest request,
-            @RequestHeader("Authorization") String authorizationHeader
+            @RequestBody @Valid UpdateUserRequest request
     ) {
-        return ResponseEntity.ok(userService.updateUserById(authorizationHeader, request));
+        return ResponseEntity.ok(userService.updateUserById(request));
     }
 
     @Operation(
@@ -98,10 +97,9 @@ public class UserController {
     })
     @PatchMapping("/me/password")
     public ResponseEntity<Void> updatePasswordCurrentUser(
-            @RequestBody @Valid UpdatePasswordRequest request,
-            @RequestHeader("Authorization") String authorizationHeader
+            @RequestBody @Valid UpdatePasswordRequest request
     ) {
-        userService.updatePasswordById(authorizationHeader, request);
+        userService.updatePasswordById(request);
         return ResponseEntity.noContent().build();
     }
 
@@ -135,10 +133,8 @@ public class UserController {
             )
     })
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> readCurrentUser(
-            @RequestHeader("Authorization") String authorizationHeader
-    ) {
-        return ResponseEntity.ok(userService.getUserById(authorizationHeader));
+    public ResponseEntity<UserResponse> readCurrentUser() {
+        return ResponseEntity.ok(userService.getUserById());
     }
 
     @Operation(
@@ -167,10 +163,8 @@ public class UserController {
             )
     })
     @DeleteMapping("/me")
-    public ResponseEntity<Void> deleteCurrentUser(
-            @RequestHeader("Authorization") String authorizationHeader
-    ) {
-        userService.deleteUserById(authorizationHeader);
+    public ResponseEntity<Void> deleteCurrentUser() {
+        userService.deleteUserById();
         return ResponseEntity.noContent().build();
     }
 
