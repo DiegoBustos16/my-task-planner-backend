@@ -1,12 +1,14 @@
 package diegobustos.my_task_planner_backend.service;
 
-import diegobustos.my_task_planner_backend.dto.AuthResponse;
-import diegobustos.my_task_planner_backend.dto.RegisterRequest;
+import diegobustos.my_task_planner_backend.dto.*;
 import diegobustos.my_task_planner_backend.entity.User;
+import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import diegobustos.my_task_planner_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,49 @@ public class UserService {
 
         String token = jwtService.generateToken(user.getEmail());
         return new AuthResponse(token);
+    }
+
+    public UserResponse updateUserById(String authorizationHeader, UpdateUserRequest request) {
+        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        userRepository.save(user);
+
+        return UserResponse.fromEntity(user);
+    }
+
+    public UserResponse getUserById(String authorizationHeader) {
+        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return UserResponse.fromEntity(user);
+    }
+
+    public void updatePasswordById(String authorizationHeader, UpdatePasswordRequest request) {
+        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("The password is incorrect");
+        }
+
+        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
+    }
+
+    public void deleteUserById (String authorizationHeader) {
+        String email = jwtService.extractUsername(authorizationHeader.replace("Bearer ", ""));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setDeletedAt(Instant.now());
+        userRepository.save(user);
     }
 
 }
