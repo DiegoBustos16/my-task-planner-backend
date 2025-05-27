@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleOtherErrors(Exception ex) {
         Map<String, String> body = new HashMap<>();
-        body.put("message", "Something went wrong");
+        body.put("message", "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
