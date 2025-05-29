@@ -106,7 +106,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(req)))
                     .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("Something went wrong"));
+                    .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
         }
     }
 
@@ -184,7 +184,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(req)))
                     .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("Something went wrong"));
+                    .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
         }
     }
 }
