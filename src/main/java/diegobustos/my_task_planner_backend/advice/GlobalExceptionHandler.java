@@ -1,6 +1,7 @@
 package diegobustos.my_task_planner_backend.advice;
 
 
+import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -45,10 +46,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleOtherErrors(Exception ex) {
         Map<String, String> body = new HashMap<>();
-        body.put("message", "Something went wrong");
+        body.put("message", "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

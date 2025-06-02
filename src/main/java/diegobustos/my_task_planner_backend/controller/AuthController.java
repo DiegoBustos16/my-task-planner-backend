@@ -62,7 +62,7 @@ public class AuthController {
                     description = "Unexpected internal error.",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(value = "{\"message\": \"Something went wrong\"}")
+                            examples = @ExampleObject(value = "{\"message\": \"An unexpected error occurred\"}")
                     )
             )
     })

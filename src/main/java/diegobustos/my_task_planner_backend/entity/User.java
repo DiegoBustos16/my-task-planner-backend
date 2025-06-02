@@ -1,19 +1,22 @@
 package diegobustos.my_task_planner_backend.entity;
 
+import diegobustos.my_task_planner_backend.entity.common.AuditableEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
-public class User {
+public class User extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +33,7 @@ public class User {
     @Schema(description = "User's last name.", example = "Bustos")
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, updatable = false)
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     @Schema(description = "User's email address.", example = "user@example.com")
