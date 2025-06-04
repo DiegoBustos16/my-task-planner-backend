@@ -1,6 +1,7 @@
 package diegobustos.my_task_planner_backend.advice;
 
 
+import diegobustos.my_task_planner_backend.exception.BoardNotFoundException;
 import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(BoardNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleBoardNotFound(BoardNotFoundException ex) {
         Map<String, String> body = new HashMap<>();
         body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
