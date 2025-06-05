@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -43,4 +46,13 @@ public class User extends AuditableEntity {
     @NotBlank(message = "Password is required")
     @Schema(description = "Encrypted user password.", example = "$2a$10$...")
     private String password;
+
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    @Schema(description = "List of boards associated with the user.")
+    private List<UserBoard> boards = new ArrayList<>();
 }
