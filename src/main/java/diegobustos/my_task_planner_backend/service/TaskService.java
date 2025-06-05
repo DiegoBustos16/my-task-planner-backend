@@ -44,7 +44,7 @@ public class TaskService {
     public List<TaskResponse> getAllTasks(Long id) {
         Board board = validateAccessAndGetBoard(id);
 
-        List<Task> tasks = taskRepository.findByBoardIdAndDeletedAtIsNull(board.getId());
+        List<Task> tasks = taskRepository.findByBoardIdAndDeletedAtIsNullOrderByCreatedAtDesc(board.getId());
 
         return tasks.stream().map(TaskResponse::fromEntity).toList();
     }

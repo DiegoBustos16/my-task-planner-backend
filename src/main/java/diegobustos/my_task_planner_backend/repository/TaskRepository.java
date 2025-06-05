@@ -10,5 +10,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Optional<Task> findByIdAndDeletedAtIsNull(Long id);
 
-    List<Task> findByBoardIdAndDeletedAtIsNull(Long id);
+    List<Task> findByBoardIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long id);
 }
