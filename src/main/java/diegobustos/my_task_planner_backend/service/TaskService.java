@@ -62,6 +62,18 @@ public class TaskService {
         return TaskResponse.fromEntity(task);
     }
 
+    public TaskResponse toggleTaskCompletion(Long taskId) {
+        Task task = taskRepository.findByIdAndDeletedAtIsNull(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+
+        Board board = validateAccessAndGetBoard(task.getBoard().getId());
+
+        task.setCompleted(!task.isCompleted());
+        taskRepository.save(task);
+
+        return TaskResponse.fromEntity(task);
+    }
+
     public void deleteTask(Long taskId) {
         Task task = taskRepository.findByIdAndDeletedAtIsNull(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found"));

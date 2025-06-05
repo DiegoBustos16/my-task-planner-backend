@@ -16,10 +16,14 @@ public class TaskResponse {
     @Schema(description = "Task Title.", example = "Daily Task")
     private String title;
 
+    @Schema(description = "Indicates whether the task is completed.", example = "true")
+    private boolean completed;
+
     public static  TaskResponse fromEntity(Task task) {
         return TaskResponse.builder()
                 .id(task.getId())
                 .title(task.getTitle())
+                .completed(task.isCompleted())
                 .build();
     }
 }

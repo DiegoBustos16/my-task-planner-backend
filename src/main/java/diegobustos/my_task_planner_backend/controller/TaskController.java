@@ -115,7 +115,7 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Board updated successfully.",
+                    description = "Task updated successfully.",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = BoardResponse.class)
@@ -144,13 +144,48 @@ public class TaskController {
                     )
             )
     })
-
     @PatchMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(
             @PathVariable Long id,
             @RequestBody @Valid TaskRequest request
     ) {
         return ResponseEntity.ok(taskService.updateTask(id, request));
+    }
+
+    @Operation(
+            summary = "Toggle task completion by Id",
+            description = "Changes a tasks completion status by its ID",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Task completion status updated successfully.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = BoardResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Task not found.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"Task not found\"}")
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"An unexpected error occurred\"}")
+                    )
+            )
+    })
+    @PatchMapping("/toggle/{id}")
+    public ResponseEntity<TaskResponse> toggleTaskCompletion(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(taskService.toggleTaskCompletion(id));
     }
 
     @Operation(

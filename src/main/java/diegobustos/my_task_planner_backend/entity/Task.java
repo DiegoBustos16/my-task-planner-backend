@@ -29,6 +29,6 @@ public class Task extends AuditableEntity {
     private Board board;
 
     @Column(nullable = false)
-    @Schema(description = "Indicates whether the task is completed", example = "false")
+    @Schema(description = "Indicates whether the task is completed.", example = "false")
     private boolean completed;
 }
