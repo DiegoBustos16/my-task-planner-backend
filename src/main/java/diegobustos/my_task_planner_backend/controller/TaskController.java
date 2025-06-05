@@ -1,6 +1,5 @@
 package diegobustos.my_task_planner_backend.controller;
 
-import diegobustos.my_task_planner_backend.dto.BoardResponse;
 import diegobustos.my_task_planner_backend.dto.TaskRequest;
 import diegobustos.my_task_planner_backend.dto.TaskResponse;
 import diegobustos.my_task_planner_backend.service.TaskService;
@@ -118,7 +117,7 @@ public class TaskController {
                     description = "Task updated successfully.",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = BoardResponse.class)
+                            schema = @Schema(implementation = TaskResponse.class)
                     )
             ),
             @ApiResponse(
@@ -163,7 +162,7 @@ public class TaskController {
                     description = "Task completion status updated successfully.",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = BoardResponse.class)
+                            schema = @Schema(implementation = TaskResponse.class)
                     )
             ),
             @ApiResponse(
