@@ -3,12 +3,14 @@ package diegobustos.my_task_planner_backend.service;
 import diegobustos.my_task_planner_backend.dto.TaskRequest;
 import diegobustos.my_task_planner_backend.dto.TaskResponse;
 import diegobustos.my_task_planner_backend.entity.Board;
+import diegobustos.my_task_planner_backend.entity.Item;
 import diegobustos.my_task_planner_backend.entity.Task;
 import diegobustos.my_task_planner_backend.entity.User;
 import diegobustos.my_task_planner_backend.exception.BoardNotFoundException;
 import diegobustos.my_task_planner_backend.exception.TaskNotFoundException;
 import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import diegobustos.my_task_planner_backend.repository.BoardRepository;
+import diegobustos.my_task_planner_backend.repository.ItemRepository;
 import diegobustos.my_task_planner_backend.repository.TaskRepository;
 import diegobustos.my_task_planner_backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,6 +28,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final BoardRepository boardRepository;
+    private final ItemRepository itemRepository;
 
     @Transactional
     public TaskResponse createTask(Long boardId, TaskRequest request){
@@ -38,7 +41,7 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        return TaskResponse.fromEntity(task);
+        return mapTaskToResponse(task);
     }
 
     public List<TaskResponse> getAllTasks(Long id) {
@@ -46,7 +49,7 @@ public class TaskService {
 
         List<Task> tasks = taskRepository.findByBoardIdAndDeletedAtIsNullOrderByCreatedAtDesc(board.getId());
 
-        return tasks.stream().map(TaskResponse::fromEntity).toList();
+        return tasks.stream().map(this::mapTaskToResponse).toList();
     }
 
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
@@ -59,7 +62,7 @@ public class TaskService {
         task.setTitle(request.getTitle());
         taskRepository.save(task);
 
-        return TaskResponse.fromEntity(task);
+        return mapTaskToResponse(task);
     }
 
     public TaskResponse toggleTaskCompletion(Long taskId) {
@@ -71,7 +74,7 @@ public class TaskService {
         task.setCompleted(!task.isCompleted());
         taskRepository.save(task);
 
-        return TaskResponse.fromEntity(task);
+        return mapTaskToResponse(task);
     }
 
     public void deleteTask(Long taskId) {
@@ -82,6 +85,11 @@ public class TaskService {
 
         task.setDeletedAt(Instant.now());
         taskRepository.save(task);
+    }
+
+    public TaskResponse mapTaskToResponse(Task task) {
+        List <Item> items = itemRepository.findByTaskIdAndDeletedAtIsNull(task.getId());
+        return TaskResponse.fromEntity(task, items);
     }
 
     private Board validateAccessAndGetBoard(Long id) {
