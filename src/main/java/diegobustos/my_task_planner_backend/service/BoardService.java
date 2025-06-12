@@ -4,7 +4,6 @@ import diegobustos.my_task_planner_backend.dto.BoardRequest;
 import diegobustos.my_task_planner_backend.dto.BoardResponse;
 import diegobustos.my_task_planner_backend.entity.Board;
 import diegobustos.my_task_planner_backend.entity.User;
-import diegobustos.my_task_planner_backend.entity.UserBoard;
 import diegobustos.my_task_planner_backend.exception.BoardNotFoundException;
 import diegobustos.my_task_planner_backend.exception.UserNotFoundException;
 import diegobustos.my_task_planner_backend.repository.BoardRepository;
@@ -57,15 +56,7 @@ public class BoardService {
     }
 
     public BoardResponse updateBoard(Long boardId, BoardRequest request) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        Board board = user.getBoards().stream()
-                .map(UserBoard::getBoard)
-                .filter(b -> b.getId().equals(boardId) && b.getDeletedAt() == null)
-                .findFirst()
-                .orElseThrow(() -> new BoardNotFoundException("Board not found"));
+        Board board = validateAccessAndGetBoard(boardId);
 
         board.setTitle(request.getTitle());
         boardRepository.save(board);
@@ -74,17 +65,20 @@ public class BoardService {
     }
 
     public void deleteBoard(Long boardId) {
+        Board board = validateAccessAndGetBoard(boardId);
+
+        board.setDeletedAt(Instant.now());
+        boardRepository.save(board);
+    }
+
+    private Board validateAccessAndGetBoard(Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Board board = user.getBoards().stream()
-                .map(UserBoard::getBoard)
-                .filter(b -> b.getId().equals(boardId) && b.getDeletedAt() == null)
-                .findFirst()
+        Board board = boardRepository.findByUserEmailAndBoardIdAndDeletedAtIsNull(email, id)
                 .orElseThrow(() -> new BoardNotFoundException("Board not found"));
 
-        board.setDeletedAt(Instant.now());
-        boardRepository.save(board);
+        return board;
     }
 }
