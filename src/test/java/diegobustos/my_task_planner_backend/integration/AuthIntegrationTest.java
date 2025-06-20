@@ -1,6 +1,5 @@
 package diegobustos.my_task_planner_backend.integration;
 
-import diegobustos.my_task_planner_backend.config.DotenvInitializer;
 import diegobustos.my_task_planner_backend.dto.AuthRequest;
 import diegobustos.my_task_planner_backend.dto.AuthResponse;
 import diegobustos.my_task_planner_backend.dto.RegisterRequest;
@@ -26,11 +25,7 @@ class AuthIntegrationTest {
     private RegisterRequest validRegister;
     private AuthRequest validLogin;
 
-    static {
-        new DotenvInitializer();
-    }
-
-        @BeforeEach
+    @BeforeEach
     void setUp() {
         validRegister = RegisterRequest.builder()
                 .firstName("Name")
